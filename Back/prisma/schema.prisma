@@ -1,13 +1,33 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
-}
-
 datasource db {
   provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Usuario {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  nome      String
+  senha  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime? // Para o Soft Delete recomendado no roteiro! [cite: 17]
+  tarefas     Tarefas[]   @relation("UsuarioTarefas")
+
+  @@map("usuarios")
+}
+
+model Tarefas {
+  id          String   @id @default(uuid())
+  titulo       String
+  descricao String
+  status      String   @default("pending") // pending, in_progress, done [cite: 42]
+  deUsuario  String?
+  usuario     Usuario?    @relation("UsuarioTarefas", fields: [deUsuario], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tarefas")
 }
