@@ -3,6 +3,7 @@ import { Router } from 'express';
 import usuariosController from '../controllers/usuarios'
 import tarefasController from '../controllers/tarefas'
 import authController from '../controllers/auth'
+import dashboardController from '../controllers/dashboard'
 
 const router = Router();
 
@@ -24,5 +25,7 @@ router.delete("/tasks/:id", tarefasController.deleteTarefas);
 router.post("/auth/login", authController.login);
 router.post("/auth/logout", authController.logout);
 
+// DashBoard
+router.get("/dashboard", dashboardController.getMetrics);
 
 export default router;

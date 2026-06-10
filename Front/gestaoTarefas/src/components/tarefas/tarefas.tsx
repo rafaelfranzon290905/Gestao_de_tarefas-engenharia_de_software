@@ -13,6 +13,7 @@ export function TarefasPage() {
   const [usuarios, setUsuarios] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [usuarioFiltrado, setUsuarioFiltrado] = useState<string>("")
+  const [statusFiltrado, setStatusFiltrado] = useState<string>("")
   const navigate = useNavigate()
 
   // Busca os usuários para alimentar os selects (Filtro e Modal)
@@ -32,9 +33,10 @@ export function TarefasPage() {
   const fetchTarefas = useCallback(async () => {
     setLoading(true)
     try {
-      const url = usuarioFiltrado 
-        ? `http://localhost:3000/tasks?usuarioId=${usuarioFiltrado}`
-        : "http://localhost:3000/tasks"
+      const params = new URLSearchParams()
+      if (usuarioFiltrado) params.append("usuarioId", usuarioFiltrado)
+      if (statusFiltrado) params.append("status", statusFiltrado)
+      const url = `http://localhost:3000/tasks?${params.toString()}`
 
       const response = await fetch(url)
       if (response.ok) {
@@ -46,7 +48,7 @@ export function TarefasPage() {
     } finally {
       setLoading(false)
     }
-  }, [usuarioFiltrado])
+  }, [usuarioFiltrado, statusFiltrado])
 
   useEffect(() => {
     fetchUsuarios()
@@ -79,6 +81,17 @@ export function TarefasPage() {
                 {user.nome}
               </option>
             ))}
+          </select>
+
+          <select
+            value={statusFiltrado}
+            onChange={(e) => setStatusFiltrado(e.target.value)}
+            className="flex h-10 w-60 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="">Todos os Status</option>
+            <option value="Pendente">Pendente</option>
+            <option value="Em Andamento">Em Andamento</option>
+            <option value="Concluido">Concluída</option>
           </select>
         </div>
 

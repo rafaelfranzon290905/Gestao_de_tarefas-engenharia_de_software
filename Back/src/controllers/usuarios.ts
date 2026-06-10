@@ -104,9 +104,9 @@ const putUsuario = async (req: Request, res: Response): Promise<void> => {
 
         // Prepara os dados para atualização
         const dadosAtualizacao: any = { nome, email };
-
+        
         if (createdAt) {
-            dadosAtualizacao.createdAt = new Date(createdAt);
+            dadosAtualizacao.createdAt = createdAt
         }
 
         if (senha && senha.trim() !== "") {

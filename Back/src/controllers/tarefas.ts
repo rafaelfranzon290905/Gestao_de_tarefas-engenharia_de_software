@@ -4,11 +4,18 @@ import prisma from "../prisma";
 // GET /tasks?assignedTo={userId} - Listaa tarefas de um usuário tal
 const getTarefas = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { usuarioId } = req.query;
+        const { usuarioId, status } = req.query;
 
         const whereClause: any = {};
         if (usuarioId) {
             whereClause.deUsuario = Number(usuarioId);
+        }
+
+        if (status) {
+            whereClause.status = {
+                equals: String(status),
+                mode: 'insensitive'
+            };
         }
 
         const tarefas = await prisma.tarefas.findMany({
