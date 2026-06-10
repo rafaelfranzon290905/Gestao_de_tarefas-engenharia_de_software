@@ -1,0 +1,3 @@
+DATABASE_URL="postgresql://neondb_owner:npg_BU6VyC9bkMDh@ep-bitter-term-aq1ghqy9-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+PORT = 3000
+JWT_SECRET = "e27309c3c5346af6d96881a2cbbfb471a7833ef66f9c8ad63a35f84c37ac9dc8"
