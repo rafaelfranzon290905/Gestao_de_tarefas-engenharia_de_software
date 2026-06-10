@@ -4,16 +4,15 @@ import prisma from "../prisma";
 // GET /tasks?assignedTo={userId} - Listaa tarefas de um usuário tal
 const getTarefas = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { assignedTo } = req.query; 
+        const { usuarioId } = req.query;
 
-        let filtro: any = {};
-
-        if (assignedTo) {
-            filtro.deUsuario = Number(assignedTo);
+        const whereClause: any = {};
+        if (usuarioId) {
+            whereClause.deUsuario = Number(usuarioId);
         }
 
         const tarefas = await prisma.tarefas.findMany({
-            where: filtro,
+            where: whereClause,
             include: {
                 usuario: { select: { id: true, nome: true, email: true } }
             },
@@ -63,6 +62,19 @@ const postTarefa = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
+        const idValido = (deUsuario && !isNaN(Number(deUsuario))) ? Number(deUsuario) : null;
+
+        if (idValido !== null) {
+            const usuarioExiste = await prisma.usuario.findFirst({
+                where: { id: idValido, deletedAt: null }
+            });
+
+            if (!usuarioExiste) {
+                res.status(404).json({ error: true, message: "Usuário responsável não encontrado ou inativo." });
+                return;
+            }
+        }
+
         if (deUsuario) {
             const usuarioExiste = await prisma.usuario.findFirst({
                 where: { id: Number(deUsuario), deletedAt: null }
@@ -75,7 +87,7 @@ const postTarefa = async (req: Request, res: Response): Promise<void> => {
         }
 
         const novaTarefa = await prisma.tarefas.create({
-            data: { titulo, descricao, status, deUsuario },
+            data: { titulo, descricao, status, deUsuario: idValido },
             include: {
                 usuario: { select: { id: true, nome: true, email: true } } // dados do usuário associado
             }

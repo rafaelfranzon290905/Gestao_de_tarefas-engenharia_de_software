@@ -10,11 +10,14 @@ import {
   CheckSquare,
   X,
   Users,
+  LogOut,
   FileText,
   DollarSign,
 } from "lucide-react"
+import { toast } from "sonner"
+import { useState } from "react"
 
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 
 const navItems = [
   { id: 1, icon: Rocket, path: "/dashboard", label: "Dashboard" },
@@ -24,6 +27,31 @@ const navItems = [
 
 export function AppSidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    
+    try {
+      await fetch("http://localhost:3000/auth/logout", { 
+        method: "POST" 
+      })
+    } catch (error) {
+      console.error("Erro ao avisar o servidor do logout:", error)
+    } finally {
+      // Apaga os dados do usuário e o token do navegador de forma limpa
+      localStorage.clear()
+      sessionStorage.clear()
+
+      toast.success("Sessão encerrada com sucesso!")
+      
+      // Redireciona para a página de login substituindo o histórico
+      navigate("/login", { replace: true })
+      setIsLoggingOut(false)
+    }
+  }
+
 
   return (
     <div className="h-full rounded-2xl shadow-lg bg-sidebar border border-sidebar-border flex flex-col overflow-hidden">
@@ -58,7 +86,7 @@ export function AppSidebar() {
                       flex items-center gap-3 h-8 px-4 rounded-full transition-all duration-200
                       ${
                         isActive
-                          ? "bg-primary text-primary-foreground shadow-sm font-semibold"
+                          ? "bg-blue-600 text-primary-foreground shadow-sm font-semibold"
                           : "text-sidebar-foreground hover:bg-sidebar-accent/95 hover:text-sidebar-foreground"
                       }
                     `}
@@ -71,6 +99,17 @@ export function AppSidebar() {
             </div>
           </div>
         </div>
+      </div>
+      {/* Footer - Botão de Logout Fixo Embaixo */}
+      <div className="p-4 border-t border-sidebar-border bg-sidebar-muted/20">
+        <Button 
+          variant="ghost" 
+          onClick={handleLogout}
+          className="w-full flex items-center justify-start gap-3 h-9 px-4 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-full transition-all duration-200"
+        >
+          <LogOut className="h-5 w-5 shrink-0" />
+          <span className="font-medium text-sm">Sair da Conta</span>
+        </Button>
       </div>
     </div>
   )

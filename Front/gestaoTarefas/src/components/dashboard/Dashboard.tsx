@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react"
+import { PageHeader } from "../page-header"
 
-
-// Aqui vamos chamar nosso localStorage para dar oi ao usuário sempre que ele entrar na aplicação
-const nomeDeUsuario = "Bianca"
 
 // Criamos uma interface para o TypeScript saber o que existe em um usuário
 interface InterfaceUsuario {
@@ -12,7 +10,12 @@ interface InterfaceUsuario {
 }
 
 export function Dashboard() {
-  const [usuario, setUsuario] = useState<InterfaceUsuario[] | null>(null)
+  const [usuarios, setUsuarios] = useState<InterfaceUsuario[] | null>(null)
+  const [usuarioLogado, setUsuarioLogado] = useState<InterfaceUsuario | null>(null)
+
+  // Aqui vamos chamar nosso localStorage para dar oi ao usuário sempre que ele entrar na aplicação
+  const usuario = localStorage.getItem("currentUser")
+  const usuarioDados = JSON.parse(usuario)
 
   const loadData = async () => {
     const response = await fetch("http://localhost:3000/usuarios")
@@ -29,11 +32,13 @@ export function Dashboard() {
   }, [])
 
   return (
-    <div className="bg-blue-800">
-      <p className="text-white">Bem vindo(a), {nomeDeUsuario}!</p>
-      {usuario && usuario.map((user) => (
-        <p key={user.id} className="text-white">{user.nome} - {user.email}</p>
-      ))}
-    </div>
+    <>
+      <PageHeader
+              title={`Bem vindo(a), ${usuarioDados.nome}`}
+              subtitle="Informações Recentes do usuário."
+            />
+      <p className="text-white">Bem vindo(a), {usuarioDados.nome}!</p>
+      
+    </>
   )
 }

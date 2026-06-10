@@ -9,7 +9,8 @@ const getUsuarios = async (req: Request, res: Response): Promise<void> => {
         select: {
             id: true,
             nome: true,
-            email: true
+            email: true,
+            createdAt: true
         },
         orderBy: {
             nome: 'asc'
@@ -36,7 +37,8 @@ const getUsuarioById = async (req: Request, res: Response): Promise<void> => {
         const { id } = req.params;
         const usuario = await prisma.usuario.findUnique({
             where: { id: Number(id) },
-            select: { id: true, nome: true, email: true }
+            select: { id: true, nome: true, email: true, tarefas: true, createdAt: true },
+            
         });
 
         if (!usuario) {

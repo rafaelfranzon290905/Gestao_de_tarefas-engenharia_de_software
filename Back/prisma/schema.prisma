@@ -1,33 +1,33 @@
-datasource db {
-  provider = "postgresql"
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+}
+
 model Usuario {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  email     String    @unique
   nome      String
-  senha  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime? // Para o Soft Delete recomendado no roteiro! [cite: 17]
-  tarefas     Tarefas[]   @relation("UsuarioTarefas")
+  senha     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  id        Int       @id @default(autoincrement())
+  tarefas   Tarefas[] @relation("UsuarioTarefas")
 
   @@map("usuarios")
 }
 
 model Tarefas {
-  id          Int       @id @default(autoincrement())
-  titulo       String
+  titulo    String
   descricao String
-  status      String   @default("pending") // pending, in_progress, done [cite: 42]
-  deUsuario   Int?
-  usuario     Usuario?    @relation("UsuarioTarefas", fields: [deUsuario], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  deUsuario Int?
+  usuario   Usuario? @relation("UsuarioTarefas", fields: [deUsuario], references: [id])
 
   @@map("tarefas")
-} 
+}

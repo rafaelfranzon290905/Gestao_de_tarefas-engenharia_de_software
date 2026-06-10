@@ -33,37 +33,48 @@ export function Login() {
 
   // Executa o logout automaticamente ao entrar na página para limpar sessões antigas
   useEffect(() => {
-    const runLogout = async () => {
-      await fetch("/auth/logout", { method: "POST" })
-    }
-    runLogout()
+    localStorage.clear()
+    sessionStorage.clear()
+    
+    fetch("http://localhost:3000/auth/logout", { method: "POST" })
+      .catch(() => console.log("Sem sessão anterior para limpar."))
   }, [])
 
   const handleSubmit = async (values: LoginFormValues) => {
     setIsLoading(true)
 
     // Ajustado para bater exatamente com a rota do Gestor de Tarefas (/auth/login)
-    const response = await fetch("/auth/login", {
+    const response = await fetch("http://localhost:3000/auth/login", {
       method: "POST",
+      headers: {
+          "Content-Type": "application/json", 
+        },
+      credentials: "include",
       body: JSON.stringify({
         email: values.email,
         senha: values.senha,
       }),
     })
 
-    if (!response.error) {
-      // Salva os dados básicos do usuário no LocalStorage se o login for bem-sucedido
-      localStorage.setItem("currentUser", JSON.stringify(response.data))
-      
-      toast.success(response.message || "Bem-vindo de volta!")
-      
-      // Redireciona para o dashboard ou raiz da aplicação
-      navigate("/", { replace: true })
-    } else {
-      toast.error(response.message || "Erro ao realizar login.")
+    const resultado = await response.json()
+
+    if (response.ok && !resultado.error) {
+        
+        // SALVANDO NO LOCALSTORAGE:
+        // Pega os dados básicos do usuário que o seu backend devolve em resultado.data
+        localStorage.setItem("currentUser", JSON.stringify(resultado.data))
+        // localStorage.setItem("token", resultado.data.token)
+
+        toast.success(resultado.message || "Bem-vindo de volta!")
+        
+        // Redireciona para o dashboard
+        navigate("/dashboard", { replace: true })
+
+      } else {
+        toast.error(resultado.message || "Erro ao realizar login.")
+      }
+      setIsLoading(false)
     }
-    setIsLoading(false)
-  }
 
   return (
     <div

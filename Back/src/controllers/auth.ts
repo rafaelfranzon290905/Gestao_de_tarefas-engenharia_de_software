@@ -46,24 +46,24 @@ const login = async (req: Request, res: Response): Promise<void> => {
         }
 
         // Geração do Token JWT mapeando a estrutura atual do banco de tarefas
-        const token = jwt.sign(
-            {
-                id: usuario.id,
-                nome: usuario.nome,
-                email: usuario.email,
-            },
-            JWT_SECRET,
-            { expiresIn: ACCESS_TOKEN_EXPIRES_IN }
-        );
+        // const token = jwt.sign(
+        //     {
+        //         id: usuario.id,
+        //         nome: usuario.nome,
+        //         email: usuario.email,
+        //     },
+        //     JWT_SECRET,
+        //     { expiresIn: ACCESS_TOKEN_EXPIRES_IN }
+        // );
 
         // Define o token nos cookies HTTPOnly do navegador
-        const umaHoraEmMs = 60 * 60 * 1000;
-        res.cookie("_tk", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            maxAge: 60 * 60 * 1000,
-        });
+        // const umaHoraEmMs = 60 * 60 * 1000;
+        // res.cookie("_tk", token, {
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === "production",
+        //     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        //     maxAge: 60 * 60 * 1000,
+        // });
 
         res.status(200).json({
             error: false,
@@ -71,7 +71,8 @@ const login = async (req: Request, res: Response): Promise<void> => {
             data: {
                 id: usuario.id,
                 nome: usuario.nome,
-                email: usuario.email
+                email: usuario.email,
+                // token: token
             }
         });
     } catch (error) {
@@ -83,9 +84,6 @@ const login = async (req: Request, res: Response): Promise<void> => {
 // POST /auth/logout → Logout do usuário
 const logout = async (req: Request, res: Response): Promise<void> => {
     try {
-        // Limpa o cookie de autenticação zerando o tempo de vida (maxAge: 0)
-        res.clearCookie(COOKIE_NAME, getCookieOptions(0));
-        
         res.status(200).json({
             error: false,
             message: "Logout realizado com sucesso."
