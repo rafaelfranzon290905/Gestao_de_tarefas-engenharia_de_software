@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { Dashboard } from "./components/dashboard/Dashboard"
 import { Login } from "./components/login/login"
 import { AppSidebar } from "./components/app-sidebar"
@@ -14,6 +14,8 @@ function App() {
     
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
         <Route path="/login" element={<Login />} />
 
         <Route element={<Layout />}>
