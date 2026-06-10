@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 // Get/usuarios pega todos os usuários
 const getUsuarios = async (req: Request, res: Response): Promise<void> => {
     const usuarios = await prisma.usuario.findMany({
+        where: {deletedAt: null},
         select: {
             id: true,
             nome: true,
@@ -89,7 +90,7 @@ const postUsuario = async (req: Request, res: Response): Promise<void> => {
 const putUsuario = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const { nome, email } = req.body;
+        const { nome, email, senha, createdAt } = req.body;
 
         // Verifica se o usuário existe e está ativo antes de atualizar
         const usuarioExiste = await prisma.usuario.findFirst({
@@ -101,10 +102,21 @@ const putUsuario = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
+        // Prepara os dados para atualização
+        const dadosAtualizacao: any = { nome, email };
+
+        if (createdAt) {
+            dadosAtualizacao.createdAt = new Date(createdAt);
+        }
+
+        if (senha && senha.trim() !== "") {
+            dadosAtualizacao.senha = await bcrypt.hash(senha, 10);
+        }
+
         const usuarioAtualizado = await prisma.usuario.update({
             where: { id: Number(id) },
-            data: { nome, email },
-            select: { id: true, nome: true, email: true }
+            data: dadosAtualizacao,
+            select: { id: true, nome: true, email: true, createdAt: true }
         });
 
         res.status(200).json({ error: false, data: usuarioAtualizado });

@@ -6,6 +6,7 @@ import { Layout } from "./layout"
 import { UsersPage } from "./components/usuarios/usuarios"
 import { TarefasPage } from "./components/tarefas/tarefas"
 import { UserDetail } from "./components/usuarios/usuarioDetails"
+import { TaskDetail } from "./components/tarefas/tarefasDetail"
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/usuarios" element={<UsersPage />}/>
           <Route path="/usuarios/:id" element={<UserDetail />}/>
           <Route path="/tarefas" element={<TarefasPage />}/>
+          <Route path="/tarefas/:id" element={<TaskDetail />}/>
           
         
         </Route>

@@ -27,18 +27,16 @@ export const columns = (): ColumnDef<any>[] => {
       },
     },
     {
+      accessorKey: "Status",
+      header: "Status",
+      cell: ({ row }) => {
+        return row.original.status
+      }
+    },
+    {
       accessorKey: "Responsavel",
       header: "Responsável",
       cell: ({ row }) => <span>{row.original.usuario.nome}</span>,
-    },
-    {
-      id: "actions",
-      header: "",
-      cell: () => (
-        <Button variant="ghost" size="icon">
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      ),
     },
   ]
   return cols

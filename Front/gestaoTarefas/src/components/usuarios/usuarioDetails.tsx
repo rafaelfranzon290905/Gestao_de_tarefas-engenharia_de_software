@@ -16,9 +16,16 @@ import {
   ListChecks,
   User,
   Mail,
+  Trash2,
   CalendarDays,
 } from "lucide-react"
 import { toast } from "sonner"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover" // ajuste o caminho se necessário
+import { Calendar } from "../ui/calendar" // ajuste o caminho se necessário
+import { CalendarIcon } from "lucide-react" // certifique-se de importar ou usar o CalendarDays que já tinha
+import { DeleteUserDialog } from "./deleteUsuario"
 
 // Interface de definição com base no seu banco Prisma/Neon
 interface Task {
@@ -33,6 +40,7 @@ interface UserProfile {
   id: number
   nome: string
   email: string
+  senha: string
   createdAt: string
   tarefas?: Task[] // Array de tarefas que o usuário participa
 }
@@ -43,6 +51,7 @@ export function UserDetail() {
 
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("detalhe")
   const [usuario, setUsuario] = useState<UserProfile | null>(null)
 
@@ -90,6 +99,8 @@ export function UserDetail() {
         body: JSON.stringify({
           nome: usuario.nome,
           email: usuario.email,
+          senha: usuario.senha,
+          createdAt: usuario.createdAt,
         }),
       })
 
@@ -161,16 +172,17 @@ export function UserDetail() {
               </Button>
             )
           }
+
+            <Button 
+                  variant="destructive" 
+                  onClick={() => setIsDeleteOpen(true)} 
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" /> Excluir
+              </Button>
+
           </div>
 
-            // {/* <DeleteDialogGeral
-            //   endpoint={`/usuarios/${id}`}
-            //   nomeEntidade="Usuário"
-            //   nomeObjeto={usuario.nome}
-            //   cascata={true}
-            //   onSuccess={() => navigate("/usuarios")}
-            // /> */}
-          // {/* // </div> */}
         }
       />
 
@@ -205,21 +217,58 @@ export function UserDetail() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-slate-400 flex items-center gap-1">
-                    <CalendarDays className="h-3 w-3 text-slate-500" /> Data de Cadastro
+                  <label className="text-sm font-medium text-slate-400">
+                    Data de Cadastro
                   </label>
-                  <Input
-                    disabled
-                    value={
-                      usuario.createdAt 
-                        ? new Date(usuario.createdAt).toLocaleDateString("pt-BR", {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        disabled={!isEditing}
+                        className={`w-full justify-start text-left font-normal ${
+                          !isEditing
+                            ? "border-transparent bg-secondary/40 text-foreground opacity-90 shadow-none cursor-not-allowed"
+                            : ""
+                        }`}
+                      >
+                        {usuario?.createdAt ? (
+                          format(new Date(usuario.createdAt), "PPP", {
+                            locale: ptBR,
                           })
-                        : "Data não disponível"
-                    }
-                    className="bg-secondary/40 border-transparent text-foreground opacity-90 cursor-not-allowed"
+                        ) : (
+                          <span>—</span>
+                        )}
+                        <CalendarIcon className="mr-2 ml-auto h-4 w-4 text-slate-500" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        fixedWeeks
+                        locale={ptBR}
+                        selected={usuario?.createdAt ? new Date(usuario.createdAt) : undefined}
+                        onSelect={(date) => {
+                          if (date) {
+                            setUsuario({
+                              ...usuario,
+                              // .toISOString() garante o formato correto que o Prisma/Postgres espera
+                              createdAt: date.toISOString(), 
+                            })
+                          }
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-slate-400">Senha</label>
+                  <Input
+                    type="password"
+                    disabled={!isEditing}
+                    value={usuario.senha}
+                    onChange={(e) => setUsuario({ ...usuario, senha: e.target.value })}
+                    className={!isEditing ? "bg-secondary/40 border-transparent text-foreground opacity-90 cursor-not-allowed" : ""}
                   />
                 </div>
               </CardContent>
@@ -239,7 +288,7 @@ export function UserDetail() {
                   usuario.tarefas.map((tarefa) => (
                     <div
                       key={tarefa.id}
-                      className="flex items-center justify-between rounded-xl border p-4 bg-card hover:bg-secondary/20 transition-all duration-200 shadow-sm"
+                      className="flex items-center justify-between rounded-xl p-4 bg-card hover:bg-secondary/20 transition-all duration-200 shadow-sm"
                     >
                       <div className="flex flex-col gap-1 min-w-0 flex-1 pr-4">
                         <span className="font-semibold text-sm truncate text-foreground">
@@ -276,6 +325,14 @@ export function UserDetail() {
 
         </Tabs>
       </main>
+
+      <DeleteUserDialog
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        usuarioId={usuario.id}
+        usuarioNome={usuario.nome}
+        onSuccess={() => navigate("/usuarios")}
+      />
     </>
   )
 }

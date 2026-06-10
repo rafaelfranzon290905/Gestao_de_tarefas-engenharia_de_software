@@ -52,7 +52,7 @@ export function AddTarefaModal({ usuarios, onSuccess }: AddTarefaModalProps) {
     defaultValues: {
       titulo: "",
       descricao: "",
-      status: "pending",
+      status: "Pendente",
       deUsuario: "none",
     },
   })
@@ -142,6 +142,33 @@ export function AddTarefaModal({ usuarios, onSuccess }: AddTarefaModalProps) {
                   <FormControl>
                     <Input placeholder="Detalhes da tarefa..." {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status do Andamento</FormLabel>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full bg-background">
+                        <SelectValue placeholder="Selecione o status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Pendente">Pendente</SelectItem>
+                      <SelectItem value="Em Andamento">Em Andamento</SelectItem>
+                      <SelectItem value="Concluido">Concluido</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

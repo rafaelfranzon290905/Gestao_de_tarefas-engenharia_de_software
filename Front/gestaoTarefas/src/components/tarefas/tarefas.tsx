@@ -6,12 +6,14 @@ import { AddTarefaModal } from "./addTarefaModal"
 import { Loader2 } from "lucide-react"
 import { type ColumnDef } from "@tanstack/react-table"
 import { columns } from "./columns"
+import { useNavigate } from "react-router-dom"
 
 export function TarefasPage() {
   const [data, setData] = useState<any[]>([])
   const [usuarios, setUsuarios] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [usuarioFiltrado, setUsuarioFiltrado] = useState<string>("")
+  const navigate = useNavigate()
 
   // Busca os usuários para alimentar os selects (Filtro e Modal)
   const fetchUsuarios = async () => {
@@ -89,6 +91,8 @@ export function TarefasPage() {
           <DataTable
             columns={columns()}
             data={data}
+            clickable
+            onRowClick={(row) => navigate(`/tarefas/${row.id}`)}
             filterColumn={["titulo", "descricao"]}
             filterPlaceholder="Buscar por título ou descrição..."
           />
