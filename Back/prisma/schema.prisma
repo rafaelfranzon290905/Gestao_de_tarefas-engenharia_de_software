@@ -7,7 +7,7 @@ generator client {
 }
 
 model Usuario {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   email     String   @unique
   nome      String
   senha  String
@@ -20,11 +20,11 @@ model Usuario {
 }
 
 model Tarefas {
-  id          String   @id @default(uuid())
+  id          Int       @id @default(autoincrement())
   titulo       String
   descricao String
   status      String   @default("pending") // pending, in_progress, done [cite: 42]
-  deUsuario  String?
+  deUsuario   Int?
   usuario     Usuario?    @relation("UsuarioTarefas", fields: [deUsuario], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
